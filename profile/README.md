@@ -1,40 +1,62 @@
 # HexaGlue
 
-**Focus on business code, not infrastructure glue.**
+***Focus on business code, not infrastructure glue.***
+<br><br>
 
-HexaGlue is a compile-time tool that analyzes the domain of hexagonal applications and generates infrastructure glue around it.
+> [!NOTE]
+> **HexaGlue automatically generates the infrastructure code around your hexagonal architecture, so you can focus on what matters: your business logic.**
+
+## What is HexaGlue?
+
+HexaGlue is a compile-time tool that analyzes your domain code and generates all the infrastructure adapters you need. Write your ports once, and let HexaGlue create the REST controllers, database repositories, message handlers, and more.
+
+```text
+┌─────────────────┐                    ┌─────────────────────────────────┐
+│  Domain Code    │                    │  Complete Application           │
+│                 │     HexaGlue       │                                 │
+│  • Ports        │  ──────────────>   │  • Domain Code (unchanged)      │
+│  • Use Cases    │    mvn compile     │  • REST Controllers (generated) │
+│  • Entities     │                    │  • Repositories (generated)     │
+│                 │                    │  • Message Handlers (generated) │
+└─────────────────┘                    └─────────────────────────────────┘
+
+ [You write this]                           [HexaGlue generates that]
+```
 
 ## How it works
 
-1. **Domain analysis**  
-   HexaGlue analyzes and models the domain of a hexagonal application at compile time.
+HexaGlue works in three simple steps during your build:
 
-2. **Plugin delegation**  
-   The analyzed domain model is delegated to specialized plugins through a stable SPI.
+1. **Analyze** - Scans your domain code and identifies ports (interfaces your business needs)
+2. **Delegate** - Passes the domain model to specialized plugins via a stable SPI
+3. **Generate** - Creates infrastructure adapters (REST, database, messaging, etc.) automatically
 
-3. **Infrastructure generation**  
-   Plugins generate the required infrastructure glue code around the domain.
+## Why use HexaGlue?
 
-## Key Principles
+✅ **Pure domain code** - Your business logic stays clean, with zero infrastructure dependencies
 
-1. **Your domain stays pure** - HexaGlue never modifies your business code
-2. **Zero boilerplate** - Write ports once, infrastructure adapters are generated in seconds, not days
-3. **Plugin-based** - Extensible architecture for any technology stack
-4. **Compile-time safety** - Generation happens during compilation with full type checking
-5. **Replaceable infrastructure** - Swap infrastructure without touching business logic, by switching plugins
+✅ **No boilerplate** - Write a port interface once, get production-ready adapters in seconds
 
-## Project structure
+✅ **Type-safe** - Generation happens at compile time with full type checking
+
+✅ **Flexible infrastructure** - Swap technologies (REST to GraphQL, MySQL to MongoDB) by changing plugins, not code
+
+✅ **Extensible** - Add support for any technology through the plugin system
+
+## Getting started
 
 The HexaGlue project is organized into three repositories:
 
-1. **[Engine](https://github.com/hexaglue/engine)** - the compile-time analysis and generation core
-2. **[Plugins](https://github.com/hexaglue/plugins)** - official infrastructure generators built on a stable SPI
-3. **[Examples](https://github.com/hexaglue/examples)** - real-world usage examples and integration scenarios
+- **[Engine](https://github.com/hexaglue/engine)** - Core analysis and generation engine
+- **[Plugins](https://github.com/hexaglue/plugins)** - Official infrastructure generators (REST, JPA, Kafka, etc.)
+- **[Examples](https://github.com/hexaglue/examples)** - Real-world usage examples and tutorials
+
+> [!TIP]
+> **Start with the [Examples](https://github.com/hexaglue/examples) repository to see HexaGlue in action.**
 
 ## Status
 
-- HexaGlue is under active development.
-- The core engine and SPI are designed for stability, while new plugins are added incrementally.
+HexaGlue is under active development. The core engine and SPI are stable, while new plugins are added regularly.
 
 ---
 
