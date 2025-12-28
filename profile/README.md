@@ -6,6 +6,18 @@
 > [!NOTE]
 > **HexaGlue automatically generates the infrastructure code around your hexagonal architecture, so you can focus on what matters: your business logic.**
 
+
+---
+
+> [!WARNING]
+> **Work in Progress - Handle with Care!**
+>
+> HexaGlue is under active development with significant refactoring ongoing. The codebase is evolving rapidly, APIs may change without notice, and dragons may still lurk in the corners.
+>
+> **TL;DR: Don't put this in production yet.** Perfect for learning, experimenting, and contributing - but keep your production code safe for now.
+
+---
+
 ## What is HexaGlue?
 
 HexaGlue is a compile-time tool that analyzes your domain code and generates all the infrastructure adapters you need. Write your ports once, and let HexaGlue create the REST controllers, database repositories, message handlers, and more.
