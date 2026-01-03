@@ -1,82 +1,141 @@
 # HexaGlue
 
 ***Focus on business code, not infrastructure glue.***
-<br><br>
-
-> [!NOTE]
-> **HexaGlue automatically generates the infrastructure code around your hexagonal architecture, so you can focus on what matters: your business logic.**
-
 
 ---
 
 > [!WARNING]
-> **Work in Progress - Handle with Care!**
->
-> HexaGlue is under active development with significant refactoring ongoing. The codebase is evolving rapidly, APIs may change without notice, and dragons may still lurk in the corners.
->
-> **TL;DR: Don't put this in production yet.** Perfect for learning, experimenting, and contributing - but keep your production code safe for now.
+> **Work in Progress** — HexaGlue is under active development and already functional.<br>
+> APIs may still evolve, and the project is not yet considered production-ready.
 
 ---
 
-## What is HexaGlue?
+## The Problem
 
-HexaGlue is a compile-time tool that analyzes your domain code and generates all the infrastructure adapters you need. Write your ports once, and let HexaGlue create the REST controllers, database repositories, message handlers, and more.
+Hexagonal Architecture promises clean separation between business logic and infrastructure. In practice, developers spend countless hours writing repetitive adapter code: JPA entities mirroring domain objects, repositories implementing port interfaces, mappers converting between layers, controllers exposing use cases...
 
-```text
-┌─────────────────┐                    ┌─────────────────────────────────┐
-│  Domain Code    │                    │  Complete Application           │
-│                 │     HexaGlue       │                                 │
-│  • Ports        │  ──────────────>   │  • Domain Code (unchanged)      │
-│  • Use Cases    │    mvn compile     │  • REST Controllers (generated) │
-│  • Entities     │                    │  • Repositories (generated)     │
-│                 │                    │  • Message Handlers (generated) │
-└─────────────────┘                    └─────────────────────────────────┘
+This boilerplate is tedious, error-prone, and distracts from what matters: **your business logic**.
 
- [You write this]                           [HexaGlue generates that]
+## The Solution
+
+HexaGlue eliminates this friction. Define your domain model and ports once—HexaGlue generates all the infrastructure adapters at compile time.
+
+```mermaid
+flowchart LR
+    M[MODELIZE<br>Build AST] e1@==> C[CLASSIFY<br>Identify concepts]
+    C e2@==> JPA
+    C e3@==> REST
+    C e4@==> KAFKA
+    C e5@==> MORE
+
+    subgraph GENERATE
+        JPA[Plugin JPA]
+        REST[Plugin REST]
+        KAFKA[Plugin Kafka]
+        MORE[...]
+    end
+
+    JPA f1@--> id1@{ shape: docs, label: "Entities<br>Repos" }
+    REST f2@--> id2@{ shape: docs, label: "Controllers" }
+    KAFKA f3@--> id3@{ shape: docs, label: "Consumers<br>Producers" }
+
+    e1@{ animate: true }
+    e2@{ animate: true }
+    e3@{ animate: true }
+    e4@{ animate: true }
+    e5@{ animate: true }
+    classDef animate stroke-dasharray: 9,5,stroke-dashoffset: 900,animation: dash 25s linear infinite;
+    class f1 animate
+    class f2 animate
+    class f3 animate
 ```
 
-## How it works
+**One `mvn compile`. Zero boilerplate. Code generation with architectural insight.**
 
-HexaGlue works in three simple steps during your build:
+## Under the Hood
 
-1. **Analyze** - Scans your domain code and identifies ports (interfaces your business needs)
-2. **Delegate** - Passes the domain model to specialized plugins via a stable SPI
-3. **Generate** - Creates infrastructure adapters (REST, database, messaging, etc.) automatically
+HexaGlue builds a complete **graph model** of your application during compilation. By analyzing the AST (Abstract Syntax Tree), it understands:
 
-## Why use HexaGlue?
+- **Domain concepts** — Aggregates, entities, value objects, identifiers
+- **Architectural boundaries** — Ports, their direction (driving/driven), relationships
+- **Type relationships** — How your domain objects connect and reference each other
 
-✅ **Pure domain code** - Your business logic stays clean, with zero infrastructure dependencies
+This deep understanding enables intelligent code generation that respects your architecture, not just mechanical source-to-source transformation.
 
-✅ **No boilerplate** - Write a port interface once, get production-ready adapters in seconds
+## Philosophy
 
-✅ **Type-safe** - Generation happens at compile time with full type checking
+**Non-invasive** — HexaGlue never modifies your code. Your domain stays pure.
 
-✅ **Flexible infrastructure** - Swap technologies (REST to GraphQL, MySQL to MongoDB) by changing plugins, not code
+**Convention over configuration** — Smart heuristics detect domain concepts automatically. Annotations optional.
 
-✅ **Extensible** - Add support for any technology through the plugin system
+**Pluggable** — JPA today, MongoDB tomorrow. Change plugins, not code.
 
-## Getting started
+**Compile-time** — Full type safety. No runtime reflection. No magic.
 
-The HexaGlue project is organized into three repositories:
+---
 
-- **[Engine](https://github.com/hexaglue/engine)** - Core analysis and generation engine
-- **[Plugins](https://github.com/hexaglue/plugins)** - Official infrastructure generators (REST, JPA, Kafka, etc.)
-- **[Examples](https://github.com/hexaglue/examples)** - Real-world usage examples and tutorials
+## Comparison with Other Approaches
 
-> [!TIP]
-> **Start with the [Examples](https://github.com/hexaglue/examples) repository to see HexaGlue in action.**
+### Scope and level of abstraction
 
-## Status
+Different tools address different layers of the problem.
 
-HexaGlue is under active development. The core engine and SPI are stable, while new plugins are added regularly.
+| Approach        | Focus                                  | When         |
+| --------------- | -------------------------------------- | ------------ |
+| **Lombok**      | Reduce boilerplate within a class      | Compile-time |
+| **MapStruct**   | Generate mappers between DTOs          | Compile-time |
+| **Spring Data** | Simplify repository implementation     | Runtime      |
+| **HexaGlue**    | Generate complete infrastructure layer | Compile-time |
+
+Lombok and MapStruct operate at the class level.
+Spring Data abstracts implementations at runtime.
+HexaGlue operates at the **architectural level**.
+
+---
+
+### Architecture-aware generation
+
+HexaGlue understands **ports, adapters, aggregates and their relationships**.
+It generates a **cohesive infrastructure layer**, not isolated utilities.
+
+---
+
+### Trade-offs
+
+Most approaches force a trade-off between purity and productivity.
+
+| Approach            | Domain Purity | Flexibility | Learning Curve | Migration Cost |
+| ------------------- | ------------- | ----------- | -------------- | -------------- |
+| **Manual Adapters** | ✅ High        | ✅ High      | ☑️ Medium      | ❌ High         |
+| **Framework-based** | ❌ Low         | ☑️ Medium   | ☑️ Medium      | ❌ High         |
+| **HexaGlue**        | ✅ High        | ✅ High      | ✅ Low          | ✅ Low          |
+
+HexaGlue preserves domain purity while making infrastructure **fully regenerable**.
+Changing technology means **regenerating the infrastructure**, not rewriting it.
+
+---
+
+## Get Started
+
+**[hexaglue](https://github.com/hexaglue/hexaglue)**
+*Documentation, examples, and source code*
+
+## Contribute
+
+HexaGlue is open source under MPL-2.0. We welcome contributions of all kinds:
+
+- **Try it out** — Feedback from real usage is invaluable
+- **Report issues** — Help us find edge cases and bugs
+- **Write plugins** — Extend HexaGlue to new technologies
+- **Improve docs** — Clear documentation helps everyone
+
+Start a conversation in [GitHub Discussions](https://github.com/hexaglue/hexaglue/discussions).
 
 ---
 
 <div align="center">
 
-**HexaGlue - Focus on business code, not infrastructure glue.**
-
 Made with ❤️ by Scalastic<br>
-Copyright 2025 Scalastic - Released under MPL-2.0
+Copyright 2026 Scalastic - Released under MPL-2.0
 
 </div>
