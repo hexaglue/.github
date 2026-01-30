@@ -1,6 +1,6 @@
 # HexaGlue
 
-***Focus on business code, not infrastructure glue.***
+***Compile your architecture, not just your code.***
 
 ---
 
@@ -12,55 +12,69 @@
 
 ## The Problem
 
-Hexagonal Architecture promises clean separation between business logic and infrastructure. In practice, developers spend countless hours writing repetitive adapter code: JPA entities mirroring domain objects, repositories implementing port interfaces, mappers converting between layers, controllers exposing use cases...
+Hexagonal architecture promises clean separation, long-term maintainability, and freedom of choice.
 
-This boilerplate is tedious, error-prone, and distracts from what matters: **your business logic**.
+In practice, teams pay a constant tax:
+
+* Rewriting the same adapters again and again
+* Manually keeping domain, ports, and infrastructure aligned
+* Reviewing boilerplate instead of business logic
+* Being afraid to change infrastructure because everything is wired by hand
+
+This is not business complexity.
+It is **architectural friction**.
 
 ## The Solution
 
-HexaGlue eliminates this friction. Define your domain model and ports once—HexaGlue generates all the infrastructure adapters at compile time.
+HexaGlue is an **architecture compiler** for Java applications.
+
+At compile time, it **parses** your source code, builds an **application graph**, and **classifies**:
+
+* **Domain concepts** — Aggregates, entities, value objects, identifiers
+* **Architectural boundaries** — Ports, their direction (driving / driven), and their relationships
+* **Structural relationships** — How domain types connect, reference, and depend on each other
+
+From this **architectural model**, plugins — discovered via SPI — can **audit**, **document**, and **generate**, always respecting your architecture, never making blind assumptions.
 
 ```mermaid
 flowchart LR
-    M[MODELIZE<br>Build AST] e1@==> C[CLASSIFY<br>Identify concepts]
-    C e2@==> JPA
-    C e3@==> REST
-    C e4@==> KAFKA
-    C e5@==> MORE
-
-    subgraph GENERATE
-        JPA[Plugin JPA]
-        REST[Plugin REST]
-        KAFKA[Plugin Kafka]
-        MORE[...]
+    subgraph CORE["🧠 HexaGlue Core"]
+        direction TB
+        P["🧬 PARSE<br>Semantic model"]
+        G["🔬 ANALYZE<br>Application graph"]
+        C["🗂️ CLASSIFY<br>Ports · Actors · Domain"]
+        M["🔀 MODELIZE<br>Architectural model"]
     end
+    subgraph PLUGINS["🔌 Plugins (via SPI)"]
+        direction TB
+        O1["📘 Living Documentation"]
+        O2["🛡️ Architecture Audit"]
+        O3["🏛️ 🔬Infrastructure Code<br>(JPA / REST / Messaging…)"]
+    end
+    MVN["⚙️ Maven Plugin<br>compile · verify"] L_MVN_CORE_0@==> CORE
+    P L_P_G_0@-.-> G
+    G L_G_C_0@-.-> C
+    C L_C_M_0@-.-> M
+    CORE L_CORE_O1_0@==> O1 & O2 & O3
 
-    JPA f1@--> id1@{ shape: docs, label: "Entities<br>Repos" }
-    REST f2@--> id2@{ shape: docs, label: "Controllers" }
-    KAFKA f3@--> id3@{ shape: docs, label: "Consumers<br>Producers" }
+    P:::step
+    G:::step
+    C:::step
+    M:::step
+    O1:::step
+    O2:::step
+    O3:::step
+    MVN:::maven
+    classDef step fill:#f8fafc,stroke:#64748b,stroke-width:1px,color:#0f172a
+    classDef maven fill:#eff6ff,stroke:#3b82f6,stroke-width:1px,color:#0f172a
 
-    e1@{ animate: true }
-    e2@{ animate: true }
-    e3@{ animate: true }
-    e4@{ animate: true }
-    e5@{ animate: true }
-    classDef animate stroke-dasharray: 9,5,stroke-dashoffset: 900,animation: dash 25s linear infinite;
-    class f1 animate
-    class f2 animate
-    class f3 animate
+    L_MVN_CORE_0@{ animation: slow }
+    L_CORE_O1_0@{ animation: slow }
+    L_CORE_O2_0@{ animation: slow }
+    L_CORE_O3_0@{ animation: slow }
 ```
 
-**One `mvn compile`. Zero boilerplate. Code generation with architectural insight.**
-
-## Under the Hood
-
-HexaGlue builds a complete **graph model** of your application during compilation. By analyzing the AST (Abstract Syntax Tree), it understands:
-
-- **Domain concepts** — Aggregates, entities, value objects, identifiers
-- **Architectural boundaries** — Ports, their direction (driving/driven), relationships
-- **Type relationships** — How your domain objects connect and reference each other
-
-This deep understanding enables intelligent code generation that respects your architecture, not just mechanical source-to-source transformation.
+**One `mvn compile`. Architecture analyzed, validated, and generated.**
 
 ## Philosophy
 
@@ -68,7 +82,7 @@ This deep understanding enables intelligent code generation that respects your a
 
 **Convention over configuration** — Smart heuristics detect domain concepts automatically. Annotations optional.
 
-**Pluggable** — JPA today, MongoDB tomorrow. Change plugins, not code.
+**Pluggable** — Audit, documentation, JPA today. REST, Kafka, GraphQL tomorrow. Change plugins, not code.
 
 **Compile-time** — Full type safety. No runtime reflection. No magic.
 
@@ -80,12 +94,12 @@ This deep understanding enables intelligent code generation that respects your a
 
 Different tools address different layers of the problem.
 
-| Approach        | Focus                                  | When         |
-| --------------- | -------------------------------------- | ------------ |
-| **Lombok**      | Reduce boilerplate within a class      | Compile-time |
-| **MapStruct**   | Generate mappers between DTOs          | Compile-time |
-| **Spring Data** | Simplify repository implementation     | Runtime      |
-| **HexaGlue**    | Generate complete infrastructure layer | Compile-time |
+| Approach        | Focus                                                      | When         |
+| --------------- | ---------------------------------------------------------- | ------------ |
+| **Lombok**      | Reduce boilerplate within a class                          | Compile-time |
+| **MapStruct**   | Generate mappers between DTOs                              | Compile-time |
+| **Spring Data** | Simplify repository implementation                         | Runtime      |
+| **HexaGlue**    | Compile architecture into audits, docs, and infrastructure | Compile-time |
 
 Lombok and MapStruct operate at the class level.
 Spring Data abstracts implementations at runtime.
@@ -106,8 +120,8 @@ Most approaches force a trade-off between purity and productivity.
 
 | Approach            | Domain Purity | Flexibility | Learning Curve | Migration Cost |
 | ------------------- | ------------- | ----------- | -------------- | -------------- |
-| **Manual Adapters** | ✅ High        | ✅ High      | ☑️ Medium      | ❌ High         |
-| **Framework-based** | ❌ Low         | ☑️ Medium   | ☑️ Medium      | ❌ High         |
+| **Manual Adapters** | ✅ High        | ✅ High      | ☑️ Medium       | ❌ High         |
+| **Framework-based** | ❌ Low         | ☑️ Medium    | ☑️ Medium       | ❌ High         |
 | **HexaGlue**        | ✅ High        | ✅ High      | ✅ Low          | ✅ Low          |
 
 HexaGlue preserves domain purity while making infrastructure **fully regenerable**.
