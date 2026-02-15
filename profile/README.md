@@ -2,11 +2,7 @@
 
 ***Compile your architecture, not just your code.***
 
----
-
-> [!WARNING]
-> **Work in Progress** — HexaGlue is under active development and already functional.<br>
-> APIs may still evolve, and the project is not yet considered production-ready.
+**[hexaglue.io](https://hexaglue.io)** · Core `5.0.0` · Plugins `2.0.0` · License `MPL-2.0`
 
 ---
 
@@ -76,9 +72,17 @@ flowchart LR
 
 **One `mvn compile`. Architecture analyzed, validated, and generated.**
 
+## What It Enables
+
+**Observable** — Your domain model becomes visible: aggregates, relationships, ports, services. Documentation is generated from source code, always synchronized.
+
+**Governable** — Hexagonal boundaries and architecture rules are continuously verified in CI/CD. Dependency violations and classification ambiguities are detected automatically.
+
+**Actionable** — The architectural model directly feeds infrastructure generation. Less glue code, more business logic.
+
 ## Philosophy
 
-**Non-invasive** — HexaGlue never modifies your code. Your domain stays pure.
+**Non-invasive** — HexaGlue never modifies your code. Your domain stays pure. No runtime footprint.
 
 **Convention over configuration** — Smart heuristics detect domain concepts automatically. Annotations optional.
 
@@ -129,10 +133,41 @@ Changing technology means **regenerating the infrastructure**, not rewriting it.
 
 ---
 
+## Features
+
+| Plugin | What it does |
+| ------ | ------------ |
+| **Classification** | Detects DDD patterns automatically: aggregates, entities, value objects, identifiers, domain events, ports, application services. Each classification is traceable and justified. |
+| **Architecture Audit** | Scores your architecture across 5 weighted dimensions (DDD compliance, hexagonal structure, dependencies, coupling, cohesion). Violations are localized and categorized. Remediation effort is estimated. |
+| **Living Documentation** | Generates always-up-to-date architecture documentation with Mermaid diagrams: aggregates, entities, ports, services, domain events. Reflects real code, not intentions. |
+| **JPA Generation** | Generates JPA entities, Spring Data repositories, MapStruct mappers, port adapters, and configuration classes. Pure domain preserved, infrastructure synchronized at each build. |
+
+---
+
+## Case Study
+
+The **[E-Commerce Migration](https://hexaglue.io/case-studies/ecommerce-migration/)** case study walks through a 7-step migration of a Spring Boot monolith to hexagonal architecture with HexaGlue:
+
+* **Before**: 50 classes, 37 violations, score 15/100
+* **After**: 68 manual classes + 29 generated, 1 violation, score 63/100
+
+Source code: **[hexaglue/case-study-ecommerce](https://github.com/hexaglue/case-study-ecommerce)**
+
+---
+
 ## Get Started
 
-**[hexaglue](https://github.com/hexaglue/hexaglue)**
-*Documentation, examples, and source code*
+**[Documentation](https://hexaglue.io/docs/getting-started/)** — Installation, configuration, first build
+
+**[Source code & examples](https://github.com/hexaglue/hexaglue)** — Repository with ready-to-run examples
+
+```xml
+<plugin>
+  <groupId>io.hexaglue</groupId>
+  <artifactId>hexaglue-maven-plugin</artifactId>
+  <version>5.0.0</version>
+</plugin>
+```
 
 ## Contribute
 
@@ -148,6 +183,8 @@ Start a conversation in [GitHub Discussions](https://github.com/hexaglue/hexaglu
 ---
 
 <div align="center">
+
+**[hexaglue.io](https://hexaglue.io)**
 
 Made with ❤️ by Scalastic<br>
 Copyright 2026 Scalastic - Released under MPL-2.0
