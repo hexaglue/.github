@@ -2,7 +2,7 @@
 
 ***Compile your architecture, not just your code.***
 
-**[hexaglue.io](https://hexaglue.io)** · Core `5.0.0` · Plugins `2.0.0` · License `MPL-2.0`
+**[hexaglue.io](https://hexaglue.io)** · Core `6.0.0` · Plugins `3.0.0` · License `MPL-2.0`
 
 ---
 
@@ -144,7 +144,9 @@ Changing technology means **regenerating the infrastructure**, not rewriting it.
 
 ---
 
-## Case Study
+## Case Studies
+
+### E-Commerce Migration
 
 The **[E-Commerce Migration](https://hexaglue.io/case-studies/ecommerce-migration/)** case study walks through a 7-step migration of a Spring Boot monolith to hexagonal architecture with HexaGlue:
 
@@ -152,6 +154,12 @@ The **[E-Commerce Migration](https://hexaglue.io/case-studies/ecommerce-migratio
 * **After**: 68 manual classes + 29 generated, 1 violation, score 63/100
 
 Source code: **[hexaglue/case-study-ecommerce](https://github.com/hexaglue/case-study-ecommerce)**
+
+### Lombok
+
+The **Lombok** case study validates HexaGlue's automatic Lombok support on a real-world Spring Boot application using `@Data`, `@Builder`, `@AllArgsConstructor`, and other Lombok annotations.
+
+Source code: **[hexaglue/case-study-lombok](https://github.com/hexaglue/case-study-lombok)** (fork of [Elec_business_spring](https://github.com/Nahima697/Elec_business_spring))
 
 ---
 
@@ -165,7 +173,7 @@ Source code: **[hexaglue/case-study-ecommerce](https://github.com/hexaglue/case-
 <plugin>
   <groupId>io.hexaglue</groupId>
   <artifactId>hexaglue-maven-plugin</artifactId>
-  <version>5.0.0</version>
+  <version>6.0.0</version>
 </plugin>
 ```
 
